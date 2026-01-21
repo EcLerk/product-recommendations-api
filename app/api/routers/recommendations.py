@@ -1,12 +1,14 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+
+from app.services.recommendations import RecommendationsService
 
 router = APIRouter()
 
 
-@router.get('/recommendations')
-async def get_recommendations(
-        recommendations_service,
-        uid: str,
-):
-    await recommendations_service.get_recommendations(uid=uid)
+@router.get('/')
+def get_recommendations(
+        user_id: int,
+        recommendations_service: RecommendationsService = Depends(),
+) -> list[int]:
+    return recommendations_service.get_user_recommendations(user_id=user_id)
 

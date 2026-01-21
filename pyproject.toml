@@ -6,8 +6,11 @@ authors = [
     {name = "Lera Kachanovskaya",email = "lerakachanovskaya@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
+    "pandas (>=3.0.0,<4.0.0)",
+    "uvicorn (>=0.40.0,<0.41.0)",
+    "fastapi (>=0.128.0,<0.129.0)"
 ]
 
 

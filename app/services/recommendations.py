@@ -1,4 +1,5 @@
 import os
+from typing import Any
 
 from pandas import read_csv, DataFrame
 from app.services.utils.utils import limit_by_brand_decorator
@@ -26,13 +27,15 @@ class RecommendationsService:
 
         return df
 
-    def get_user_recommendations(self, user_id: int) -> list[int]:
+    def get_user_recommendations(self, user_id: int) -> dict[str, Any]:
         df = self._load_data()
 
         if user_id in df["uid"].values:
-            return self._recommend_for_existing_user(df=df, user_id=user_id)
+            recommendations = self._recommend_for_existing_user(df=df, user_id=user_id)
         else:
-            return self._recommend_for_new_user(df=df)
+            recommendations = self._recommend_for_new_user(df=df)
+
+        return {"uid": user_id, "products": recommendations}
 
     @limit_by_brand_decorator()
     def _recommend_for_existing_user(self, df: DataFrame, user_id: int) -> list[int]:

@@ -1,7 +1,7 @@
 import os
-from collections import defaultdict
 
-from pandas import read_csv, DataFrame, to_datetime
+from pandas import read_csv, DataFrame
+from app.services.utils.utils import limit_by_brand_decorator
 
 
 class RecommendationsService:
@@ -34,6 +34,7 @@ class RecommendationsService:
         else:
             return self._recommend_for_new_user(df=df)
 
+    @limit_by_brand_decorator()
     def _recommend_for_existing_user(self, df: DataFrame, user_id: int) -> list[int]:
         user_df = df[df["uid"] == user_id]
 
@@ -52,8 +53,9 @@ class RecommendationsService:
             .sort_values(by="interest_score", ascending=False)
         )
 
-        return self._limit_by_brand(scored)
+        return scored
 
+    @limit_by_brand_decorator()
     def _recommend_for_new_user(self, df: DataFrame) -> list[int]:
         scored = (
             df.assign(
@@ -68,33 +70,8 @@ class RecommendationsService:
             .sort_values(by="popularity_score", ascending=False)
         )
 
-        return self._limit_by_brand(scored)
+        return scored
 
-    def _limit_by_brand(
-            self,
-            df: DataFrame,
-            brand_col: str = "brand",
-            pid_col: str = "pid",
-            max_per_brand: int = 2,
-            top_n: int = 5,
-    ) -> list[int]:
-        brand_counter = defaultdict(int)
-        result = []
-
-        for _, row in df.iterrows():
-            brand = row[brand_col]
-            pid = row[pid_col]
-
-            if brand_counter[brand] < max_per_brand:
-                result.append(pid)
-                brand_counter[brand] += 1
-
-            if len(result) == top_n:
-                break
-
-        print("_" * 100)
-        print(result)
-        return result
 
 
 
